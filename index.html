@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>جرعت حقیقت</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            background: white;
+            border-radius: 20px;
+            padding: 15px;
+        }
+
+        .title {
+            text-align: center;
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 5px;
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 0.8em;
+            margin-bottom: 15px;
+        }
+
+        .status {
+            text-align: center;
+            background: #fff3cd;
+            padding: 8px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .input-row input {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 0.9em;
+        }
+
+        .input-row button {
+            padding: 10px 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .mode-btns {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .mode-btns button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            background: #eee;
+        }
+
+        .mode-btns .active-boys {
+            background: #4a90e2;
+            color: white;
+        }
+
+        .mode-btns .active-girls {
+            background: #e91e63;
+            color: white;
+        }
+
+        .wheel-box {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            margin: 0 auto 15px;
+        }
+
+        .wheel-box svg {
+            width: 100%;
+            height: 100%;
+            transition: transform 4s ease-out;
+        }
+
+        .pointer-arrow {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2em;
+            z-index: 10;
+            animation: bounce 0.8s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(-8px); }
+        }
+
+        .spin-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        .spin-btn:active {
+            background: #c0392b;
+        }
+
+        .spin-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .result-box {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 10px;
+            font-weight: bold;
+            display: none;
+        }
+
+        .result-box .gold {
+            background: #FFD700;
+            padding: 3px 10px;
+            border-radius: 8px;
+        }
+
+        .result-box .green {
+            background: #4ECDC4;
+            padding: 3px 10px;
+            border-radius: 8px;
+            color: white;
+        }
+
+        .players-list {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        .players-list h3 {
+            text-align: center;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        .player-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 8px 10px;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+
+        .player-item.gold-border {
+            border: 2px solid #FFD700;
+            background: #fffdf0;
+        }
+
+        .player-item.green-border {
+            border: 2px solid #4ECDC4;
+            background: #f0fff0;
+        }
+
+        .delete-btn {
+            background: #ff4444;
+            color: white;
+            border: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            display: none;
+        }
+
+        .overlay.show {
+            display: flex;
+        }
+
+        .question-popup {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            width: 90%;
+            max-width: 320px;
+            text-align: center;
+        }
+
+        .question-popup .who {
+            font-size: 1em;
+            margin-bottom: 10px;
+        }
+
+        .question-popup .question {
+            font-size: 1.2em;
+            color: #e74c3c;
+            font-weight: bold;
+            background: #fff5f5;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .question-popup .btns {
+            display: flex;
+            gap: 10px;
+        }
+
+        .question-popup .btns button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        .btn-yes {
+            background: #4ECDC4;
+        }
+
+        .btn-no {
+            background: #FF6B6B;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        .question-count {
+            text-align: center;
+            font-size: 0.75em;
+            color: #999;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="title">🎯 جرعت حقیقت</div>
+        <div class="subtitle">گردونه رو بچرخون!</div>
+
+        <div class="status" id="status">👆 اول بازیکن اضافه کن</div>
+
+        <div class="input-row">
+            <input type="text" id="nameInput" placeholder="اسم بازیکن..." maxlength="10">
+            <button onclick="addPlayer()">➕ اضافه</button>
+        </div>
+
+        <div class="mode-btns">
+            <button id="boysBtn" class="active-boys" onclick="setMode('boys')">👦 پسرونه</button>
+            <button id="girlsBtn" onclick="setMode('girls')">👧 دخترونه</button>
+        </div>
+
+        <div class="wheel-box">
+            <div class="pointer-arrow">👇</div>
+            <svg id="wheelSvg" viewBox="0 0 300 300">
+                <circle cx="150" cy="150" r="145" fill="#eee" stroke="#333" stroke-width="4"/>
+                <text x="150" y="155" text-anchor="middle" font-size="14" fill="#999">بازیکن اضافه کن</text>
+            </svg>
+        </div>
+
+        <button class="spin-btn" id="spinBtn" onclick="spin()">🎡 بچرخون</button>
+
+        <div class="question-count" id="questionCount"></div>
+
+        <div class="result-box" id="resultBox">
+            <span class="gold" id="askerSpan">--</span>
+            ➡️ میپرسه از ➡️
+            <span class="green" id="answererSpan">--</span>
+        </div>
+
+        <div class="players-list">
+            <h3>👥 بازیکنان (برای حذف کلیک کن)</h3>
+            <div id="playersContainer">
+                <div style="text-align:center;color:#999;padding:15px;">کسی اضافه نشده</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay">
+        <div class="question-popup">
+            <div class="who" id="whoAsks"></div>
+            <div class="question" id="questionDisplay"></div>
+            <div class="btns">
+                <button class="btn-yes" onclick="answer(true)">✅ انجام میدم</button>
+                <button class="btn-no" onclick="answer(false)">❌ نه</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // داده‌ها
+        let players = [];
+        let mode = 'boys';
+        let phase = 'asker'; // 'asker' یا 'answerer'
+        let chosenAsker = null;
+        let chosenAnswerer = null;
+        let isSpinning = false;
+        let currentAngle = 0;
+
+        // سوالات پرسیده شده - این آرایه سوالات استفاده شده رو ذخیره میکنه
+        let usedQuestions = [];
+
+        // رنگ‌ها
+        const colors = ['#FF6B6B','#4ECDC4','#FFD93D','#6BCB77','#FF8B94','#45B7D1','#F7DC6F','#BB8FCE'];
+
+        // سوالات - این آرایه‌ها تغییر نمیکنن
+        const boysQAll = [
+            "آخرین باری که گریه کردی کی بود؟",
+            "ماشین مورد علاقت؟ ",
+            "اسم کراشت؟ ",
+            "سریالی که خیلی دوست داری اسمش؟ ",
+            "وقتی عصبی میشی اولین کاری ک میکنی چیه؟",
+            "چای یا قهوه؟",
+            "بارون یا برف؟",
+            "اگه یه چیزی تو وجودت بود که می‌تونستی حذفش کنی چی بود",
+            "چه چیزی رو هنوز به کسی نگفتی چون از قضاوتش می‌ترسی؟",
+            "یکی از خواباتو تعریف کن ",
+            "بیشتر از همه دلت برای کی تنگ میشه؟",
+            "سخت‌ترین حرفی که شنیدی چی بود؟",
+            "حالا کسی رو قضاوت کردی و بعد پشیمون بشی؟",
+            "بدترین اشتباهی که تو دوستی کردی چی بوده؟",
+            "کی توی خانواده بیشترین تأثیر رو روی تو گذاشته",
+            "از کدوم خاطره خانوادگی همیشه لبخندت می‌گیره؟",
+            "نزدیک‌ترین فرد زندگیت کیه؟",
+            "وقتی ناراحتی چجوری خودتو آروم می‌کنی؟",
+            "وقتی به گذشته‌ت فکر می‌کنی چی رو بیشتر از همه دوست داری تغییر بدی؟",
+            "از کدوم ویژگیت بیشتر از همه خسته شدی؟",
+            "تا حالا کسی رو دوست داشتی که نمی‌تونستی بهش بگی؟",
+            "ادم احساساتی هستی؟",
+            "کی بود که بهت قول داد ولی نموند؟",
+            "اگه فقط یک بار می‌تونستی چیزی رو فریاد بزنی و بگی چی بود؟",
+            "برنامه ای که توش خیلی فعالیت داری؟",
+            "در طول روز چقدر از گوشی استفاده میکنی؟",
+            "از کدوم ماها خوشت میاد؟",
+            "چه سبک موسیقیو بیشتر میپسندی؟",
+            "چه رنگی و دوس داری ",
+            "صدای مگس دربیار ",
+            "اگه بابات با سیگار بگیرتت واکنشت چیه ",
+            "رو دستت اسم منو بنویس عکس بفرست ",
+            "دوس پسر /دختر داری ",
+            "پیج اینستات",
+            "شمارتو میدی",
+            "صدای خروس دربیار",
+            "آخرین خلافی ک کردی چی بود ",
+            "دعوا کردی تا حالا سر ناموس",
+            "شات از نتایج گوگلت",
+            "بدترین دعوایی که کردی را تعریف کن.",
+            "یکی از فحشایی ک زیاد استفادش میکنی چیه؟",
+            ".پول یا قلب؟",
+            "تاریخ تولدت؟",
+            "هدفت برای اینده؟ ",
+            "رشتت چیه؟ ",
+            "تاحالا روح دیدی",
+            "چیزی هست که ذهنتو مشغول کرده باشه",
+            "یه جوک بگو ولی نخند",
+            "اسم دختر بگو از ج؟ ",
+            "چند بار تقلب کردی تو امتحان؟؟ ",
+            "انیمیشن مورد علاقت ",
+            "شغل مورد علاقت",
+            "عکس یهویی بده",
+            "کتک خوردی تا حالا ",
+            "دوس داری پیش مرگ کسی بشی؟کی؟",
+            "شبا اولین چیزی ک بهش فکر میکنی چیه؟",
+            "اولین ایموجی که معمولا استفاده می‌کنی کدومه و چرا؟",
+            "احمقانه‌ترین چیزی که بابتش استرس گرفتی چی بود؟",
+            "کدوم شخصیت کارتونی همیشه عاشقش موندی؟",
+            "چند تا اکانت fake یا ناشناس داری و کجاها؟",
+            "بدترین هدیه‌ای که گرفتی و مجبور شدی وانمود کنی خوشت اومده چی بود؟",
+            "دوست داری اسمت چی میبود اگه این اسم الان نبود؟",
+            "یه شایعه درمورد خودت بساز که دلت می‌خواست راست بود.",
+            "وقتی پولدار بشی، مسخره‌ترین چیزی که می‌خری چیه؟",
+            "تا حالا آیگپ نصب کردی بری فیلم ببینی؟!",
+            "اسم این‌صلیب چیه 卐 ",
+            "غمگین‌ترین آهنگی که همیشه گوش میدی چیه؟",
+            "تا به حال با دختر / پسر حرف ‌زدی ",
+            "وقتی واقعاً عصبانی میشی، توی دلت چه فحشی میدی یا چیکار می‌کنی؟",
+            "وقتی کسی که دوستش نداری ازت تعریف می‌کنه، ته دلت چی میگی؟",
+            "بامزه‌ترین اسمی که برای وای‌فای خونه گذاشتی چیه؟",
+            "کدوم اپلیکیشن رو همیشه از صفحه اصلی گوشیت قایم می‌کنی؟",
+            "وقتی عکس پروفایلت رو عوض می‌کنی، معمولاً کی رو میخوای تحت‌تاثیر بذاری؟",
+            "وقتی در یخچال رو باز می‌کنی و هیچی نیست، همون لحظه تو دلت چی میگی؟",
+            " یه کلمه که همیشه تو چت اشتباه تایپ می‌کنی و تصحیح گوشی خرابش می‌کنه.",
+            "تموم شدن کدوم شارژ (موبایل، لپتاپ، هندزفری) اعصابت رو بیش‌تر خرد می‌کنه؟",
+            "کدوم میم اینستاگرامی رو ذخیره کردی که فکر می‌کنی خلاصه خودته؟",
+            "موقع امتحان یا جلسه مهم، آهنگ کدوم خواننده تو مغلت پلی میشه؟",
+            "کدوم اسباب‌بازی بچگیت رو هنوز دلت نمیاد دور بندازی؟",
+            "یه اختراع مسخره بگو که آرزو داری وجود داشت.",
+            "کدوم خاطره رو دوست داری مثل یه فیلم، دکمه حذفش رو بزنی؟",
+            "اگه بتونی یکی از قوانین فیزیک رو برای ۲۴ ساعت بشکنی، کدوم رو و چیکار می‌کنی؟",
+            "مفهوم آزادی برای تو با یه تصویر توضیح بده، چه تصویریه؟",
+            "اگه تمام دروغ‌هایی که گفتی یک‌دفعه به صورت خال روی بدنت ظاهر بشن، چند تا خال داری؟",
+            "تنها چیزی که حاضری براش بجنگی حتی اگه همه دنیا مخالفت کنن چیه؟",
+            "اگه یه ابرقهرمان شیطانی بشی، اسم و قدرتت چیه و چرا؟",
+            "اگه روز قیامت فقط یه گفتگوی تکنفره باشه با خودت، سخت‌ترین سوالی که از خودت می‌پرسی چیه؟",
+            "اگه می‌تونستی یه کشور رو از روی نقشه محو کنی، کدوم رو؟",
+            "اولین کاری که بعد از نامرئی شدن انجام میدی که واقعاً خلافه؟",
+            "چه کسی لیاقتش رو داره که توی زندگینامه‌ات شرور اصلی لقب بگیره؟",
+            "یه اختراع شیطانی بکن که بشریت رو تا مرز انقراض ببره ولی خیلی باحال باشه.",
+            "تصور کن می‌تونی روح خودت رو برای تنبیه، ۱۰ دقیقه بفرستی تو بدن یک نفر دیگه. کی رو انتخاب می‌کنی؟",
+            "بزرگ‌ترین توهینی که به صورت تعریف شنیدی چیه؟",
+            "چه سوالی هست که اگه بقیه اینجا بپرسن، بلند می‌شی و می‌ری؟",
+            "آخرین باری که از ته دل دروغ مصلحتی گفتی تا آبروی خودت رو بخری.",
+            "چند وقته همون مسواک رو داری؟ (راستشو بگو)",
+            "وقتی همه خوابن، چه محتوایی تو اینترنت مصرف می‌کنی؟",
+            "یه استعداد عجیب داری که هیچکس نمی‌دونه؟ چیه؟",
+            "چیزی که خریدی و به بقیه گفتی قیمتش خیلی کمتر بود.",
+            "اگه ۲۰ سال دیگه زنده باشی، خودت رو چطور توصیف می‌کنی؟",
+            "به نظرت ارواح الان دارن ما رو تماشا می‌کنن؟",
+            "بهشتت رو توصیف کن با ۳ تا کلمه.",
+            "جهنمت رو توصیف کن با ۳ تا کلمه.",
+            "کدوم اشتباه اسمی رو کردی که طرف حسابی ناراحت شد؟",
+            "کدوم راز دوستت رو لو دادی که هنوز عذاب وجدان داری؟",
+            "تا حالا برای انتقام از یکی، با دوستش قرار گذاشتی؟",
+            "چه بویی رو دوست داری که همه ازش متنفرن؟ (مثل بوی بنزین، گاز فندک...)",
+            "چه خوراکی رو قایم می‌کنی تا فقط خودت بخوری؟",
+            "چه قولی دادی که از همون اول می‌دونستی زیرش می‌زنی؟",
+            "الان شارژ گوشیت چقدره و چرا همیشه کمه؟",
+            "چه کسی توی این جمع به نظرت بیشتر از بقیه تظاهر می‌کنه؟",
+            "تا حالا به خاطر پول چه کاری کردی که ازش خجالت می‌کشی؟",
+            "کثیف‌ترین عادت بچگیت که هنوز ترک نکردی.",
+            "چه کسی توی فامیل هست که مخفیانه کراش روش داری؟",
+            "حتی حاضری با کی توی این جمع ازدواج کنی فقط برای یه هفته؟",
+            "تا حالا چت رو با یکی اشتباه گرفتی و حرفای عاشقانه به غلط فرستادی؟",
+            "چت روبیکا رو نشون بده ؟!",
+            "بزرگ‌ترین نه ای که خوردی و اشکت دراومد ولی تظاهر کردی مهم نیست.",
+            "فحشی که از معشوقت خوردی و هنوز تو گوشته.",
+            "تا حالا شده با یکی قرار بذاری و فراموش کنی بری، و طرف منتظر بمونه؟",
+            "کدوم بینی رو خیلی وقته دست نکردی؟",
+            "چه چیزی رو توی حموم انجام میدی که اگه کسی بفهمه شوکه میشه؟",
+            "چه کادویی رو گرفتی و همون روز فروختی یا دور انداختی؟",
+            "چه سوالی هست که از من می‌پرسی تا بقیه رو خراب کنی؟",
+            "زشت‌ترین پیامی که پشت سر یکی نوشتی و الان می‌تونی لو بدی.",
+            "تا حالا شده خود رو پیش دختر ها /یا پسر ها خوش جلوه بدی ؟",
+            "اولین نفری که تو اینستا دنبال کردی کی بود.",
+            "تا به حال چشم ت به یک پسر / دختر افتادی .",
+            "آیا دوست داشتی دختر باشی یا پسر؟",
+            "آخر چهار رقم شمارع ت بگو ؟",
+            "چقدر به خود اعتماد داری ؟!",
+            "فیلم کمدی یا ترسناک",
+            "بزرگترین دروغی که گفتی؟",
+            "از کدوم دختر خوشت میاد؟",
+            "احمقانه‌ترین کارت چی بود؟",
+            "به کی پیام عاشقانه دادی؟",
+            "بزرگترین ترست چیه؟",
+            "کی رو بوسیدی؟",
+            "زشت‌ترین عادتت؟",
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+        ];
+
+        const girlsQAll = [
+            "آخرین باری که گریه کردی؟",
+            "از کدوم پسر خوشت میاد؟",
+            "بزرگترین دروغت؟",
+            "به کی پیام عاشقانه دادی؟",
+            "زشت‌ترین عادتت؟",
+            "بزرگترین ترست؟",
+            "احمقانه‌ترین کارت؟",
+            "رازی که نگفتی؟",
+            "اولین عشقت کی بود؟",
+            "آخرین پیامی که پاک کردی مال کی بود؟",
+            "چه کسی رو بلاک کردی و چرا؟",
+            "عکس آخرین چتت رو نشون بده",
+            "چه آرزویی داری که به کسی نگفتی؟",
+            "از کی متنفری و چرا؟",
+            "آخرین باری که حسودی کردی کی بود؟",
+        ];
+
+        // ست کردن مد
+        function setMode(m) {
+            mode = m;
+            document.getElementById('boysBtn').className = m === 'boys' ? 'active-boys' : '';
+            document.getElementById('girlsBtn').className = m === 'girls' ? 'active-girls' : '';
+        }
+
+        // گرفتن سوالات موجود بر اساس مد
+        function getAllQuestions() {
+            return mode === 'boys' ? [...boysQAll] : [...girlsQAll];
+        }
+
+        // گرفتن سوال تصادفی که قبلاً پرسیده نشده
+        function getRandomQuestion() {
+            const allQuestions = getAllQuestions();
+            
+            // سوالاتی که هنوز پرسیده نشدن
+            const availableQuestions = allQuestions.filter(q => !usedQuestions.includes(q));
+            
+            if (availableQuestions.length === 0) {
+                // همه سوالات پرسیده شدن - ریست کن
+                showToast('🔄 همه سوالات پرسیده شدن! سوالات ریست شد.');
+                usedQuestions = [];
+                updateQuestionCount();
+                return allQuestions[Math.floor(Math.random() * allQuestions.length)];
+            }
+            
+            const randomIndex = Math.floor(Math.random() * availableQuestions.length);
+            const chosenQuestion = availableQuestions[randomIndex];
+            
+            // اضافه به سوالات استفاده شده
+            usedQuestions.push(chosenQuestion);
+            updateQuestionCount();
+            
+            return chosenQuestion;
+        }
+
+        // بروزرسانی نمایش تعداد سوالات باقیمانده
+        function updateQuestionCount() {
+            const allQuestions = getAllQuestions();
+            const remaining = allQuestions.length - usedQuestions.length;
+            const countEl = document.getElementById('questionCount');
+            
+            if (players.length > 0) {
+                countEl.textContent = `📝 سوالات باقیمانده: ${remaining} از ${allQuestions.length}`;
+            } else {
+                countEl.textContent = '';
+            }
+        }
+
+        // اضافه کردن بازیکن
+        function addPlayer() {
+            const input = document.getElementById('nameInput');
+            const name = input.value.trim();
+            
+            if (!name) {
+                showToast('⚠️ اسم رو وارد کن!');
+                return;
+            }
+            
+            if (players.find(p => p.name === name)) {
+                showToast('⚠️ این اسم قبلاً اضافه شده!');
+                return;
+            }
+            
+            if (players.length >= 12) {
+                showToast('⚠️ حداکثر ۱۲ نفر میتونی اضافه کنی!');
+                return;
+            }
+            
+            players.push({ name });
+            input.value = '';
+            input.focus();
+            
+            // ریست کردن حالت
+            phase = 'asker';
+            chosenAsker = null;
+            chosenAnswerer = null;
+            
+            drawWheel();
+            showPlayers();
+            updateQuestionCount();
+            updateStatus();
+        }
+
+        // حذف بازیکن
+        function removePlayer(index) {
+            if (isSpinning) return;
+            
+            players.splice(index, 1);
+            
+            // ریست انتخاب‌ها
+            phase = 'asker';
+            chosenAsker = null;
+            chosenAnswerer = null;
+            
+            drawWheel();
+            showPlayers();
+            
+            document.getElementById('resultBox').style.display = 'none';
+            document.getElementById('overlay').classList.remove('show');
+            updateQuestionCount();
+            updateStatus();
+        }
+
+        // بروزرسانی وضعیت
+        function updateStatus() {
+            const status = document.getElementById('status');
+            if (players.length < 2) {
+                status.textContent = '👆 حداقل ۲ بازیکن اضافه کن';
+                document.getElementById('spinBtn').disabled = true;
+            } else {
+                if (phase === 'asker') {
+                    status.textContent = '🎯 گردونه رو بچرخون تا سوال‌کننده مشخص بشه';
+                } else {
+                    status.textContent = '🎯 حالا گردونه رو بچرخون تا جواب‌دهنده مشخص بشه';
+                }
+                document.getElementById('spinBtn').disabled = false;
+            }
+        }
+
+        // کشیدن گردونه
+        function drawWheel() {
+            const svg = document.getElementById('wheelSvg');
+            const cx = 150, cy = 150, r = 145;
+
+            if (players.length === 0) {
+                svg.innerHTML = `
+                    <circle cx="${cx}" cy="${cy}" r="${r}" fill="#eee" stroke="#333" stroke-width="4"/>
+                    <text x="${cx}" y="${cy+5}" text-anchor="middle" font-size="14" fill="#999">بازیکن اضافه کن</text>
+                `;
+                return;
+            }
+
+            const angle = 360 / players.length;
+            let paths = '';
+
+            players.forEach((p, i) => {
+                const startDeg = i * angle - 90;
+                const endDeg = startDeg + angle;
+                const midDeg = startDeg + angle/2;
+
+                const startRad = startDeg * Math.PI / 180;
+                const endRad = endDeg * Math.PI / 180;
+
+                const x1 = cx + r * Math.cos(startRad);
+                const y1 = cy + r * Math.sin(startRad);
+                const x2 = cx + r * Math.cos(endRad);
+                const y2 = cy + r * Math.sin(endRad);
+
+                const d = `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 0 1 ${x2} ${y2} Z`;
+
+                const tr = r * 0.6;
+                const tx = cx + tr * Math.cos(midDeg * Math.PI / 180);
+                const ty = cy + tr * Math.sin(midDeg * Math.PI / 180);
+                const rot = midDeg + 90;
+
+                let strokeW = 3;
+                let strokeC = 'white';
+                if (phase === 'answerer' && chosenAsker === i) {
+                    strokeW = 6;
+                    strokeC = '#FFD700';
+                }
+                if (phase === 'asker' && chosenAnswerer === null && chosenAsker === i) {
+                    strokeW = 6;
+                    strokeC = '#FFD700';
+                }
+
+                paths += `
+                    <path d="${d}" fill="${colors[i % 8]}" stroke="${strokeC}" stroke-width="${strokeW}"/>
+                    <text x="${tx}" y="${ty}" text-anchor="middle" dominant-baseline="middle"
+                          transform="rotate(${rot}, ${tx}, ${ty})"
+                          font-size="${players.length > 5 ? 9 : 11}" font-weight="bold" fill="white">
+                        ${p.name}
+                    </text>
+                `;
+            });
+
+            svg.innerHTML = paths + `<circle cx="${cx}" cy="${cy}" r="22" fill="white" stroke="#333" stroke-width="3"/>`;
+        }
+
+        // نمایش بازیکنان در لیست
+        function showPlayers() {
+            const container = document.getElementById('playersContainer');
+            if (players.length === 0) {
+                container.innerHTML = '<div style="text-align:center;color:#999;padding:15px;">کسی اضافه نشده</div>';
+                return;
+            }
+
+            container.innerHTML = players.map((p, i) => {
+                let cls = '';
+                if (phase === 'asker' && chosenAsker === i && chosenAnswerer === null) {
+                    cls = 'gold-border';
+                } else if (phase === 'answerer' && chosenAsker === i) {
+                    cls = 'gold-border';
+                } else if (phase === 'answerer' && chosenAnswerer === i) {
+                    cls = 'green-border';
+                }
+
+                return `
+                    <div class="player-item ${cls}">
+                        <span>${cls.includes('gold') ? '⭐ ' : cls.includes('green') ? '🎯 ' : ''}${p.name}</span>
+                        <button class="delete-btn" onclick="removePlayer(${i})">✕</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // چرخوندن گردونه
+        function spin() {
+            if (isSpinning) return;
+            if (players.length < 2) {
+                showToast('⚠️ حداقل ۲ بازیکن لازمه!');
+                return;
+            }
+
+            isSpinning = true;
+            document.getElementById('spinBtn').disabled = true;
+            document.getElementById('resultBox').style.display = 'none';
+            document.getElementById('overlay').classList.remove('show');
+
+            // چرخش تصادفی
+            const extraAngle = Math.floor(Math.random() * 360) + 720;
+            currentAngle += extraAngle;
+            document.getElementById('wheelSvg').style.transform = `rotate(${currentAngle}deg)`;
+
+            // بعد از چرخش
+            setTimeout(() => {
+                isSpinning = false;
+                document.getElementById('spinBtn').disabled = false;
+
+                // محاسبه برنده
+                const anglePerPlayer = 360 / players.length;
+                const normalizedAngle = ((currentAngle % 360) + 360) % 360;
+                const arrowAngle = 0; // فلش بالاست
+                
+                let winnerIndex = Math.floor(((360 - normalizedAngle + arrowAngle + anglePerPlayer/2) % 360) / anglePerPlayer);
+                winnerIndex = winnerIndex % players.length;
+
+                if (phase === 'asker') {
+                    // فاز اول: انتخاب سوال‌کننده
+                    chosenAsker = winnerIndex;
+                    chosenAnswerer = null;
+                    phase = 'answerer';
+                    
+                    drawWheel();
+                    showPlayers();
+                    updateStatus();
+                    
+                    document.getElementById('askerSpan').textContent = players[chosenAsker].name;
+                    document.getElementById('answererSpan').textContent = '؟؟؟';
+                    document.getElementById('resultBox').style.display = 'block';
+                    
+                    showToast(`✅ ${players[chosenAsker].name} سوال میپرسه! حالا دوباره بچرخون`);
+                    
+                } else if (phase === 'answerer') {
+                    // فاز دوم: انتخاب جواب‌دهنده
+                    // نباید خودش باشه
+                    if (winnerIndex === chosenAsker) {
+                        winnerIndex = (winnerIndex + 1) % players.length;
+                    }
+                    chosenAnswerer = winnerIndex;
+
+                    drawWheel();
+                    showPlayers();
+
+                    document.getElementById('askerSpan').textContent = players[chosenAsker].name;
+                    document.getElementById('answererSpan').textContent = players[chosenAnswerer].name;
+                    document.getElementById('resultBox').style.display = 'block';
+
+                    // نمایش سوال
+                    const question = getRandomQuestion();
+                    document.getElementById('whoAsks').textContent = 
+                        `${players[chosenAsker].name} از ${players[chosenAnswerer].name} میپرسه:`;
+                    document.getElementById('questionDisplay').textContent = question;
+                    document.getElementById('overlay').classList.add('show');
+                }
+            }, 4100);
+        }
+
+        // جواب دادن
+        function answer(did) {
+            document.getElementById('overlay').classList.remove('show');
+            
+            // ریست برای دور بعد
+            phase = 'asker';
+            chosenAsker = null;
+            chosenAnswerer = null;
+            
+            drawWheel();
+            showPlayers();
+            updateStatus();
+            
+            document.getElementById('resultBox').style.display = 'none';
+        }
+
+        // نمایش پیام
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        // کیبورد
+        document.getElementById('nameInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') addPlayer();
+        });
+
+        // شروع
+        updateStatus();
+        drawWheel();
+        showPlayers();
+    </script>
+</body>
+</html>
